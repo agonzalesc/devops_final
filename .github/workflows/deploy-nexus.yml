@@ -1,0 +1,35 @@
+name: Inicializar Nexus
+
+on:
+  workflow_dispatch:
+
+jobs:
+  init-nexus:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH a EC2 y lanzar Nexus
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            which docker || (curl -fsSL https://get.docker.com | bash && sudo usermod -aG docker $USER)
+            which docker-compose || sudo apt-get install -y docker-compose
+            mkdir -p ~/nexus-only && cd ~/nexus-only
+
+            cat <<EOF > docker-compose.yml
+            version: '3.8'
+            services:
+              nexus:
+                image: sonatype/nexus3
+                ports:
+                  - "8081:8081"
+                volumes:
+                  - nexus-data:/nexus-data
+            volumes:
+              nexus-data:
+            EOF
+
+            docker-compose up -d
