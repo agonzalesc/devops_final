@@ -19,7 +19,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             which docker || (curl -fsSL https://get.docker.com | bash && sudo usermod -aG docker $USER)
-            which docker-compose || sudo apt-get install -y docker-compose
+            which docker-compose || sudo yum-get install -y docker-compose
             mkdir -p ~/nexus-only && cd ~/nexus-only
 
             cat <<EOF > docker-compose.yml
